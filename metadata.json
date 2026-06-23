@@ -1,0 +1,10 @@
+{
+  "name": "Bonfire Roast & Grill",
+  "description": "Premium landing page for Bonfire Roast & Grill, a luxury 3D steakhouse experience in Bandung, featuring high-end motion animations, full menus, and direct reservation triggers.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

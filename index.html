@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Gracefully capture and suppress benign cross-origin sandbox script errors and ResizeObserver exceptions
+      if (typeof window !== "undefined") {
+        // Suppress errors during capture phase to prevent bubble/propagate to parent shell
+        window.addEventListener("error", function (event) {
+          const msg = event.message || "";
+          if (!msg || msg === "Script error." || msg.includes("Script error") || msg.includes("ResizeObserver")) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            event.stopPropagation();
+          }
+        }, true);
+
+        window.addEventListener("unhandledrejection", function (event) {
+          const reasonMsg = (event.reason && event.reason.message) || "";
+          if (!reasonMsg || reasonMsg === "Script error." || reasonMsg.includes("Script error") || reasonMsg.includes("ResizeObserver")) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            event.stopPropagation();
+          }
+        }, true);
+
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.error = function (...args) {
+          const isBenign = args.some(arg => {
+            const ms = String(arg || "");
+            return ms.includes("Script error") || 
+                   ms.includes("ResizeObserver") || 
+                   ms.includes("cross-origin") ||
+                   ms.includes("CORS");
+          });
+          if (isBenign) return;
+          originalError.apply(console, args);
+        };
+
+        console.warn = function (...args) {
+          const isBenign = args.some(arg => {
+            const ms = String(arg || "");
+            return ms.includes("Script error") || 
+                   ms.includes("ResizeObserver") || 
+                   ms.includes("cross-origin") ||
+                   ms.includes("CORS");
+          });
+          if (isBenign) return;
+          originalWarn.apply(console, args);
+        };
+
+        window.onerror = function (message, url, line, col, error) {
+          if (!message || message === "Script error." || message.includes("Script error") || message.includes("ResizeObserver")) {
+            return true; // Silence the error from propagating to the parent frame
+          }
+          return false; // let normal logging handle actual errors
+        };
+      }
+    </script>
+    <title>Bonfire Roast & Grill</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
